@@ -221,6 +221,7 @@ export class NetworkTileSource extends NetworkSource {
         super(source);
 
         this.tiled = true;
+        this.tms = (source.tms === true); // optionally flip tile coords for TMS
         this.url_hosts = null;
         var host_match = this.url.match(/{s:\[([^}+]+)\]}/);
         if (host_match != null && host_match.length > 1) {
@@ -231,6 +232,11 @@ export class NetworkTileSource extends NetworkSource {
 
     formatUrl(url_template, tile) {
         let coords = Geo.wrapTile(tile.coords, { x: true });
+
+        if (this.tms) {
+            coords.y = Math.pow(2, coords.z) - 1 - coords.y; // optionally flip tile coords for TMS
+        }
+
         let url = url_template.replace('{x}', coords.x).replace('{y}', coords.y).replace('{z}', coords.z);
 
         if (this.url_hosts != null) {
